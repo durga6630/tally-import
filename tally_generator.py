@@ -379,10 +379,56 @@ def generate_xml(path, out_path=None):
     return out_path
 
 
+def interactive():
+    print("""
+ Tally Prime Sales Voucher Generator
+ ====================================
+ 1. Create template XLSX file
+ 2. Generate XML from existing XLSX
+ 3. Save config file
+ 4. Exit
+""")
+    while True:
+        c = input(" Choose (1-4): ").strip()
+        if c == "1":
+            p = input(" Output path [sample.xlsx]: ").strip() or "sample.xlsx"
+            create_template(p)
+            break
+        elif c == "2":
+            p = input(" Path to your XLSX file: ").strip()
+            if p and os.path.isfile(p):
+                generate_xml(p)
+            else:
+                print(" File not found.")
+            break
+        elif c == "3":
+            p = "tally_config.json"
+            cfg = {
+                "company": COMPANY,
+                "party": PARTY,
+                "sales_ledger": SALES_LEDGER,
+                "labour_ledger": LABOUR_LEDGER,
+                "stock_item": STOCK_ITEM,
+                "godown": GODOWN,
+                "batch": BATCH,
+                "state": STATE,
+            }
+            with open(p, "w") as f:
+                json.dump(cfg, f, indent=2)
+            print(f"[OK] Config saved: {p}")
+            print("  Edit it, then run option 2 with your XLSX.")
+            break
+        elif c == "4":
+            break
+        else:
+            print(" Invalid. Enter 1-4.")
+    input("\n Press Enter to exit...")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(__doc__)
-        sys.exit(1)
+        interactive()
+        sys.exit(0)
 
     cmd = sys.argv[1]
 
@@ -410,3 +456,6 @@ if __name__ == "__main__":
     else:
         print(f"Unknown: {cmd}")
         print(__doc__)
+
+    if len(sys.argv) > 1:
+        input("\n Press Enter to exit...")
