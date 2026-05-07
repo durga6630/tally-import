@@ -60,7 +60,12 @@ def create_template(path="sample.xlsx"):
             ws.cell(r, c, val)
     for c in range(1, 6):
         ws.column_dimensions[chr(64 + c)].width = 22
-    wb.save(path)
+    try:
+        wb.save(path)
+    except PermissionError:
+        print(f"\n[!] Can't save — file may be open in Excel or protected.")
+        print(f"    Try: close Excel, or save to Desktop (e.g. C:\\Users\\{os.getlogin()}\\Desktop\\sample.xlsx)")
+        raise
     wb.close()
     print(f"[OK] Template saved: {os.path.abspath(path)}")
     print(f"  Fill the yellow rows with your data and save.")
@@ -399,14 +404,16 @@ def interactive():
                 p = clean_path(input(" Output path [sample.xlsx]: ")) or "sample.xlsx"
                 create_template(p)
                 print("\n Open the XLSX, fill your data, save it, then run option 2.")
-                break
+                input("\n Press Enter to exit...")
+                return
             elif c == "2":
                 p = clean_path(input(" Path to your XLSX file: "))
                 if not p or not os.path.isfile(p):
-                    print(f" File not found: {p}")
-                else:
-                    generate_xml(p)
-                break
+                    print(f" File not found: {p}\n")
+                    continue
+                generate_xml(p)
+                input("\n Press Enter to exit...")
+                return
             elif c == "3":
                 cfg = {
                     "company": COMPANY,
@@ -421,14 +428,17 @@ def interactive():
                 with open("tally_config.json", "w") as f:
                     json.dump(cfg, f, indent=2)
                 print("[OK] Config saved: tally_config.json")
-                break
+                input("\n Press Enter to exit...")
+                return
             elif c == "4":
                 break
             else:
                 print(" Invalid. Enter 1-4.")
+        except PermissionError:
+            print("\n[!] Permission denied - file may be open in Excel.")
+            print("    Close Excel and try again, or save to a different folder.\n")
         except Exception as e:
-            print(f"\n Error: {e}")
-            break
+            print(f"\n[!] Error: {e}\n")
     input("\n Press Enter to exit...")
 
 
