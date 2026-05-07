@@ -93,7 +93,6 @@ def make_company_item(company):
 def make_voucher(i, date, narration, raw_mat, labour, total):
     td = fmt_date(date)
     ref = esc(narration) if narration else f"VCH-{i}"
-    vno = i
     r = raw_mat
     l = labour
     t = total
@@ -113,7 +112,6 @@ def make_voucher(i, date, narration, raw_mat, labour, total):
        <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
        <PARTYNAME>{esc(PARTY)}</PARTYNAME>
        <PARTYLEDGERNAME>{esc(PARTY)}</PARTYLEDGERNAME>
-       <VOUCHERNUMBER>{vno}</VOUCHERNUMBER>
        <PERSISTEDVIEW>Invoice Voucher View</PERSISTEDVIEW>
        <NUMBERINGSTYLE>Auto Retain</NUMBERINGSTYLE>
        <EFFECTIVEDATE>{td}</EFFECTIVEDATE>
@@ -244,7 +242,7 @@ def make_voucher(i, date, narration, raw_mat, labour, total):
         <AMOUNT>{-t:.2f}</AMOUNT>
         <BANKALLOCATIONS.LIST></BANKALLOCATIONS.LIST>
         <BILLALLOCATIONS.LIST>
-         <NAME>{vno}</NAME>
+         <NAME>{ref}</NAME>
          <BILLTYPE>New Ref</BILLTYPE>
          <TDSDEDUCTEEISSPECIALRATE>No</TDSDEDUCTEEISSPECIALRATE>
          <AMOUNT>{-t:.2f}</AMOUNT>
