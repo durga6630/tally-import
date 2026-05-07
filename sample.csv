@@ -1,6 +1,0 @@
-date,ref,party,gstin,item,hsn,qty,rate,taxpct,godown,vouchernumber
-20240401,INV-001,Acme Corp,27AABCU1234D1Z2,Widget A,8471,10,100,12,Main Location,INV-001
-20240401,INV-001,Acme Corp,27AABCU1234D1Z2,Widget B,8472,5,200,12,Main Location,INV-001
-20240402,INV-002,Beta Inc,29ABCCD5678E1Z3,Gadget X,8517,3,500,18,Warehouse A,INV-002
-20240402,INV-002,Beta Inc,29ABCCD5678E1Z3,Gadget Y,8517,2,750,18,Warehouse A,INV-002
-20240403,INV-003,Gamma LLC,33ABCDE9012F1Z4,Service A,9983,1,2500,12,Main Location,INV-003

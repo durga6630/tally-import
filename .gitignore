@@ -1,2 +1,4 @@
-node_modules
-output.xml
+__pycache__
+*.pyc
+*.xml
+.DS_Store
