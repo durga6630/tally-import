@@ -484,4 +484,7 @@ if __name__ == "__main__":
         print(f"\n Error: {e}")
 
     if len(sys.argv) > 1:
-        input("\n Press Enter to exit...")
+        try:
+            input("\n Press Enter to exit...")
+        except EOFError:
+            pass
