@@ -402,13 +402,23 @@ def interactive():
             c = input(" Choose (1-4): ").strip()
             if c == "1":
                 p = clean_path(input(" Output path [sample.xlsx]: ")) or "sample.xlsx"
+                if os.path.isdir(p):
+                    p = os.path.join(p, "sample.xlsx")
+                if not p.endswith(".xlsx"):
+                    p += ".xlsx"
                 create_template(p)
                 print("\n Open the XLSX, fill your data, save it, then run option 2.")
                 input("\n Press Enter to exit...")
                 return
             elif c == "2":
                 p = clean_path(input(" Path to your XLSX file: "))
-                if not p or not os.path.isfile(p):
+                if not p:
+                    print(" No path entered.\n")
+                    continue
+                if os.path.isdir(p):
+                    print(f" That's a folder, not a file. Enter the full path including filename.xlsx\n")
+                    continue
+                if not os.path.isfile(p):
                     print(f" File not found: {p}\n")
                     continue
                 generate_xml(p)
