@@ -61,9 +61,10 @@ def create_template(path="sample.xlsx"):
     for c in range(1, 6):
         ws.column_dimensions[chr(64 + c)].width = 22
     wb.save(path)
-    print(f"[OK] Template saved: {path}")
-    print(f"  Fill rows 4+ with your data, then run:")
-    print(f"  python tally_generator.py {path}")
+    wb.close()
+    print(f"[OK] Template saved: {os.path.abspath(path)}")
+    print(f"  Fill the yellow rows with your data and save.")
+    print(f"  Then run this program again and choose option 2.")
 
 
 def fmt_date(d):
@@ -379,6 +380,9 @@ def generate_xml(path, out_path=None):
     return out_path
 
 
+def clean_path(s):
+    return s.strip().strip('"\'')
+
 def interactive():
     print("""
  Tally Prime Sales Voucher Generator
@@ -389,21 +393,58 @@ def interactive():
  4. Exit
 """)
     while True:
-        c = input(" Choose (1-4): ").strip()
-        if c == "1":
-            p = input(" Output path [sample.xlsx]: ").strip() or "sample.xlsx"
-            create_template(p)
-            break
-        elif c == "2":
-            p = input(" Path to your XLSX file: ").strip()
-            if p and os.path.isfile(p):
-                generate_xml(p)
+        try:
+            c = input(" Choose (1-4): ").strip()
+            if c == "1":
+                p = clean_path(input(" Output path [sample.xlsx]: ")) or "sample.xlsx"
+                create_template(p)
+                print("\n Open the XLSX, fill your data, save it, then run option 2.")
+                break
+            elif c == "2":
+                p = clean_path(input(" Path to your XLSX file: "))
+                if not p or not os.path.isfile(p):
+                    print(f" File not found: {p}")
+                else:
+                    generate_xml(p)
+                break
+            elif c == "3":
+                cfg = {
+                    "company": COMPANY,
+                    "party": PARTY,
+                    "sales_ledger": SALES_LEDGER,
+                    "labour_ledger": LABOUR_LEDGER,
+                    "stock_item": STOCK_ITEM,
+                    "godown": GODOWN,
+                    "batch": BATCH,
+                    "state": STATE,
+                }
+                with open("tally_config.json", "w") as f:
+                    json.dump(cfg, f, indent=2)
+                print("[OK] Config saved: tally_config.json")
+                break
+            elif c == "4":
+                break
             else:
-                print(" File not found.")
+                print(" Invalid. Enter 1-4.")
+        except Exception as e:
+            print(f"\n Error: {e}")
             break
-        elif c == "3":
-            p = "tally_config.json"
-            cfg = {
+    input("\n Press Enter to exit...")
+
+
+if __name__ == "__main__":
+    try:
+        if len(sys.argv) < 2:
+            interactive()
+            sys.exit(0)
+
+        cmd = sys.argv[1]
+
+        if cmd == "template":
+            out = sys.argv[2] if len(sys.argv) > 2 else "sample.xlsx"
+            create_template(out)
+        elif cmd == "config":
+            config = {
                 "company": COMPANY,
                 "party": PARTY,
                 "sales_ledger": SALES_LEDGER,
@@ -413,49 +454,16 @@ def interactive():
                 "batch": BATCH,
                 "state": STATE,
             }
-            with open(p, "w") as f:
-                json.dump(cfg, f, indent=2)
-            print(f"[OK] Config saved: {p}")
-            print("  Edit it, then run option 2 with your XLSX.")
-            break
-        elif c == "4":
-            break
+            with open("tally_config.json", "w") as f:
+                json.dump(config, f, indent=2)
+            print("[OK] Config saved: tally_config.json")
+        elif cmd.endswith(".xlsx"):
+            generate_xml(cmd, sys.argv[2] if len(sys.argv) > 2 else None)
         else:
-            print(" Invalid. Enter 1-4.")
-    input("\n Press Enter to exit...")
-
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        interactive()
-        sys.exit(0)
-
-    cmd = sys.argv[1]
-
-    if cmd == "template":
-        out = sys.argv[2] if len(sys.argv) > 2 else "sample.xlsx"
-        create_template(out)
-    elif cmd == "config":
-        config_path = "tally_config.json"
-        config = {
-            "company": COMPANY,
-            "party": PARTY,
-            "sales_ledger": SALES_LEDGER,
-            "labour_ledger": LABOUR_LEDGER,
-            "stock_item": STOCK_ITEM,
-            "godown": GODOWN,
-            "batch": BATCH,
-            "state": STATE,
-        }
-        with open(config_path, "w") as f:
-            json.dump(config, f, indent=2)
-        print(f"[OK] Config saved: {config_path}")
-        print(f"  Edit it, then run: python tally_generator.py <your.xlsx>")
-    elif cmd.endswith(".xlsx"):
-        generate_xml(cmd, sys.argv[2] if len(sys.argv) > 2 else None)
-    else:
-        print(f"Unknown: {cmd}")
-        print(__doc__)
+            print(f"Unknown: {cmd}")
+            print(__doc__)
+    except Exception as e:
+        print(f"\n Error: {e}")
 
     if len(sys.argv) > 1:
         input("\n Press Enter to exit...")
